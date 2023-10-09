@@ -5,6 +5,7 @@ using VacationRequester.Data;
 using VacationRequester.Repositories.Interfaces;
 using VacationRequester.Repositories;
 using VacationRequester.Middleware;
+using VacationRequester.Middleware.Cors;
 
 namespace VacationRequester
 {
@@ -27,19 +28,12 @@ namespace VacationRequester
             SwaggerAuthentication.UseSwaggerAuthentication(builder);
 
             //Add Cors
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowMyOrigin",
-                builder => builder.WithOrigins("http://localhost:5173") // Your client app's URL here
-                                   .AllowAnyHeader()
-                                   .AllowAnyMethod());
-            });
+            CorsService.AddCors(builder, builder.Configuration);
+
 
             //Connection String
             builder.Services.AddDbContext<AppDbContext>(options =>
                         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            //Serivces
 
 
             var app = builder.Build();
