@@ -4,7 +4,7 @@ namespace VacationRequester.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class LeaveRequestController : ControllerBase
     {
 
     }
