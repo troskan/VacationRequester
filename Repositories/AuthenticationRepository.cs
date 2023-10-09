@@ -1,25 +1,21 @@
-﻿using VacationRequester.Repositories.Interfaces;
+﻿using VacationRequester.Models;
+using VacationRequester.Repositories.Interfaces;
 
 namespace VacationRequester.Repositories
 {
-    public class AuthenticationRepository : IAuthenticationRepository<AuthenticationRepository>
+    public class AuthenticationRepository : IAuthenticationRepository
     {
         public Task IsLoggedInAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task VerifyCredentialsAsync(AuthenticationRepository entity)
+        public Task RefreshTokenAsync(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task RefreshTokenAsync(AuthenticationRepository entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task RegisterAsync(AuthenticationRepository entity)
+        public Task VerifyUserAsync(User entity)
         {
             throw new NotImplementedException();
         }

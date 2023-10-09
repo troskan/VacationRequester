@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace VacationRequester.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[Controller]")]
     public class EmployeeController : ControllerBase
     {
 
