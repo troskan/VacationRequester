@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using VacationRequester.Models;
 
 namespace VacationRequester.Data
 {
@@ -14,5 +15,9 @@ namespace VacationRequester.Data
             base.OnModelCreating(modelBuilder);
 
         }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
     }
 }
