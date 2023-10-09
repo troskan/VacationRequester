@@ -1,6 +1,6 @@
 ﻿namespace VacationRequester.Middleware.Cors
 {
-    public static class CorsService
+    public static class CorsMiddleware
     {
         public static void AddCors(WebApplicationBuilder builder, IConfiguration configuration)
         {

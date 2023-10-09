@@ -25,10 +25,10 @@ namespace VacationRequester
             builder.Services.AddEndpointsApiExplorer();
 
             //Add bearer token UI
-            SwaggerAuthentication.UseSwaggerAuthentication(builder);
+            SwaggerConfiguration.UseSwaggerAuthentication(builder);
 
             //Add Cors
-            CorsService.AddCors(builder, builder.Configuration);
+            CorsMiddleware.AddCors(builder, builder.Configuration);
 
 
             //Connection String

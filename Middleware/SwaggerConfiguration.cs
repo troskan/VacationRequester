@@ -2,7 +2,7 @@
 
 namespace VacationRequester.Middleware
 {
-    public static class SwaggerAuthentication
+    public static class SwaggerConfiguration
     {
         public static void UseSwaggerAuthentication(WebApplicationBuilder builder)
         {
