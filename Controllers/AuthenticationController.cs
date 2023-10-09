@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using VacationRequester.Data;
 
 namespace VacationRequester.Controllers
 {
@@ -7,14 +8,14 @@ namespace VacationRequester.Controllers
     public class AuthenticationController : ControllerBase
     {
 
-        [HttpPost]
-        public void LoginAsync()
+        [HttpPost("login")]
+        public void Login()
         {
-
+           
         }
 
-        [HttpPost]
-        public void RegisterAsync()
+        [HttpPost("register")]
+        public void Register()
         {
 
         }

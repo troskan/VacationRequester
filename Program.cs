@@ -6,6 +6,7 @@ using VacationRequester.Repositories.Interfaces;
 using VacationRequester.Repositories;
 using VacationRequester.Middleware;
 using VacationRequester.Middleware.Cors;
+using VacationRequester.Services;
 
 namespace VacationRequester
 {
@@ -18,6 +19,7 @@ namespace VacationRequester
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+            builder.Services.AddScoped<JwtService>();
             //
 
             builder.Services.AddControllers();
