@@ -11,5 +11,4 @@ namespace VacationRequester.Repositories.Interfaces
         Task IsLoggedInAsync(Guid id);
         Task RefreshTokenAsync(User entity);
     }
-
 }

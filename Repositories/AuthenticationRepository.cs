@@ -38,6 +38,7 @@ namespace VacationRequester.Repositories
 
             return true;
         }
+
         public async Task<User> GetUserByRefreshToken(RefreshToken refreshToken)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken.Token);
@@ -58,8 +59,8 @@ namespace VacationRequester.Repositories
             }
 
             return true;
-
         }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             if( email == null )
