@@ -23,7 +23,8 @@ namespace VacationRequester.Middleware.Authentication
                     ValidIssuer = "VacationRequesterAPI",
                     ValidAudience = "VacationRequesterApp",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere")),
-                    RequireExpirationTime = true
+                    RequireExpirationTime = true,
+                    ClockSkew = TimeSpan.FromSeconds(0) // Eliminate clock skew to get exact expiration time
                 };
             });
         }

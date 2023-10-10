@@ -69,7 +69,6 @@ namespace VacationRequester
                 await next();
             });
 
-
             app.Run();
         }
     }
