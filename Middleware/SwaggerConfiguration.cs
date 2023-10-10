@@ -17,6 +17,7 @@ namespace VacationRequester.Middleware
                     Type = SecuritySchemeType.Http,
                     BearerFormat = "JWT",
                     Scheme = "bearer"
+                    
                 });
 
                 opt.AddSecurityRequirement(new OpenApiSecurityRequirement

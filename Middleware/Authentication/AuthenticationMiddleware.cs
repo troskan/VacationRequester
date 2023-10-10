@@ -20,8 +20,8 @@ namespace VacationRequester.Middleware.Authentication
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "yourdomain.com",
-                    ValidAudience = "yourdomain.com",
+                    ValidIssuer = "VacationRequesterAPI",
+                    ValidAudience = "VacationRequesterApp",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere"))
                 };
             });

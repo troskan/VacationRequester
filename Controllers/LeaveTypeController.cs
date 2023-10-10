@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using VacationRequester.Models;
@@ -15,7 +16,7 @@ namespace VacationRequester.Controllers
         {
             _leaveTypeRepository = leaveTypeRepository;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

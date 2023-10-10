@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VacationRequester.Data;
@@ -63,7 +64,7 @@ public class AuthenticationController : ControllerBase
             return BadRequest();
         }
 
-        if (await _authRepository.VerifyEmailAsync(request.Email))
+        if (!await _authRepository.VerifyEmailAsync(request.Email))
         {
             return Unauthorized();
         }
@@ -75,12 +76,39 @@ public class AuthenticationController : ControllerBase
         
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
 
-        var token = await _jwtService.GenerateToken(user);
+        var token = _jwtService.GenerateToken(user);
+        var refreshToken = _jwtService.GenerateRefreshToken();
 
+        user.RefreshToken = refreshToken;
 
+        await _userRepository.UpdateAsync(user);
 
-        return null;
+        return Ok(new { token, refreshToken });
     }
 
+    [Authorize]
+    [HttpPost("RefreshToken")]
+    public async Task<IActionResult> RefreshToken(RefreshToken refreshToken)
+    {
+        if (refreshToken == null)
+        {
+            return BadRequest();
+        }
+
+        var user = await _authRepository.GetUserByRefreshToken(refreshToken);
+
+        if (user == null || user.RefreshToken.Expires < DateTime.Now)
+        {
+            return Unauthorized();
+        }
+
+        var newAccessToken = _jwtService.GenerateToken(user);
+        var newRefreshToken = _jwtService.GenerateRefreshToken();
+
+        user.RefreshToken = newRefreshToken;
+        await _userRepository.UpdateAsync(user);
+
+        return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
+    }
 }
 

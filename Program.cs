@@ -10,6 +10,7 @@ using VacationRequester.Middleware.Cors;
 using VacationRequester.Services;
 using Microsoft.AspNetCore.Authentication;
 using AuthenticationMiddleware = VacationRequester.Middleware.Authentication.AuthenticationMiddleware;
+using VacationRequester.Models;
 
 namespace VacationRequester
 {
@@ -21,6 +22,7 @@ namespace VacationRequester
 
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
 
             //Jwt Services
             builder.Services.AddScoped<JwtService>();
@@ -50,7 +52,7 @@ namespace VacationRequester
 
             app.UseCors("AllowMyOrigin");
             app.UseHttpsRedirection();
-            app.UseAuthentication();
+            //app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 
