@@ -22,7 +22,8 @@ namespace VacationRequester.Middleware.Authentication
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = "VacationRequesterAPI",
                     ValidAudience = "VacationRequesterApp",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere"))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere")),
+                    RequireExpirationTime = true
                 };
             });
         }

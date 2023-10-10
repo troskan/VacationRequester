@@ -23,6 +23,8 @@ namespace VacationRequester
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
+            builder.Services.AddScoped(typeof(JwtService));
+
 
             //Jwt Services
             builder.Services.AddScoped<JwtService>();
@@ -49,12 +51,24 @@ namespace VacationRequester
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"User authenticated: {context.User.Identity.IsAuthenticated}");
+                await next();
+            });
 
             app.UseCors("AllowMyOrigin");
             app.UseHttpsRedirection();
-            //app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"User authenticated: {context.User.Identity.IsAuthenticated}");
+                await next();
+            });
+
 
             app.Run();
         }

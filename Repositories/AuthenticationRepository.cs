@@ -40,7 +40,7 @@ namespace VacationRequester.Repositories
         }
         public async Task<User> GetUserByRefreshToken(RefreshToken refreshToken)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken.Token);
         }
 
         public async Task<bool> VerifyPasswordAsync(string password, string email)

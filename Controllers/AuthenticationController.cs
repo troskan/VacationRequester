@@ -79,7 +79,9 @@ public class AuthenticationController : ControllerBase
         var token = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
 
-        user.RefreshToken = refreshToken;
+        user.RefreshToken = refreshToken.Token;
+        user.TokenCreated = refreshToken.Created;
+        user.TokenExpires = refreshToken.Expires;
 
         await _userRepository.UpdateAsync(user);
 
@@ -97,7 +99,7 @@ public class AuthenticationController : ControllerBase
 
         var user = await _authRepository.GetUserByRefreshToken(refreshToken);
 
-        if (user == null || user.RefreshToken.Expires < DateTime.Now)
+        if (user == null || user.TokenExpires < DateTime.Now)
         {
             return Unauthorized();
         }
@@ -105,7 +107,9 @@ public class AuthenticationController : ControllerBase
         var newAccessToken = _jwtService.GenerateToken(user);
         var newRefreshToken = _jwtService.GenerateRefreshToken();
 
-        user.RefreshToken = newRefreshToken;
+        user.RefreshToken = newRefreshToken.Token;
+        user.TokenCreated = newRefreshToken.Created;
+        user.TokenExpires = newRefreshToken.Expires;
         await _userRepository.UpdateAsync(user);
 
         return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
