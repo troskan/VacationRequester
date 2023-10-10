@@ -2,11 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using VacationRequester.Data;
+using Microsoft.IdentityModel.Tokens;
 using VacationRequester.Repositories.Interfaces;
 using VacationRequester.Repositories;
 using VacationRequester.Middleware;
 using VacationRequester.Middleware.Cors;
 using VacationRequester.Services;
+using Microsoft.AspNetCore.Authentication;
+using AuthenticationMiddleware = VacationRequester.Middleware.Authentication.AuthenticationMiddleware;
 
 namespace VacationRequester
 {
@@ -19,11 +22,11 @@ namespace VacationRequester
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+            //Jwt Services
             builder.Services.AddScoped<JwtService>();
-            //
+            AuthenticationMiddleware.AddAuthenticationJwt(builder);
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
 
             //Add bearer token UI
@@ -32,11 +35,9 @@ namespace VacationRequester
             //Add Cors
             CorsMiddleware.AddCors(builder, builder.Configuration);
 
-
             //Connection String
             builder.Services.AddDbContext<AppDbContext>(options =>
-                        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
@@ -49,10 +50,8 @@ namespace VacationRequester
 
             app.UseCors("AllowMyOrigin");
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

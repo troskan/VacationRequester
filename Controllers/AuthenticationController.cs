@@ -1,24 +1,86 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VacationRequester.Data;
+using VacationRequester.Models;
+using VacationRequester.Models.Dto;
+using VacationRequester.Repositories.Interfaces;
+using VacationRequester.Services;
 
-namespace VacationRequester.Controllers
+namespace VacationRequester.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class AuthenticationController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class AuthenticationController : ControllerBase
+    private readonly JwtService _jwtService;
+    private readonly IRepository<User> _userRepository;
+    private readonly IAuthenticationRepository _authRepository;
+
+
+    public AuthenticationController(JwtService jwtService, IRepository<User> userRepository, IAuthenticationRepository authRepository)
     {
-
-        [HttpPost("login")]
-        public void Login()
-        {
-           
-        }
-
-        [HttpPost("register")]
-        public void Register()
-        {
-
-        }
-
+        _jwtService = jwtService;
+        _userRepository = userRepository;
+        _authRepository = authRepository;
     }
+
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register(RegisterDto registerDto)
+    {
+        if(registerDto == null)
+        {
+            return BadRequest();
+        }
+
+        string passwordHash
+            = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+        var userToRegister = new User
+        {
+            Email = registerDto.Email,
+            PasswordHash = passwordHash,
+            FirstName = registerDto.FirstName,
+            LastName = registerDto.LastName,
+
+            Role = Role.Employee
+        };
+
+        if (userToRegister == null)
+        {
+            return BadRequest();
+        }
+
+        await _userRepository.AddAsync(userToRegister);
+       
+        return Ok();
+    }
+
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login(LoginDto request)
+    {
+        if(request == null)
+        {
+            return BadRequest();
+        }
+
+        if (await _authRepository.VerifyEmailAsync(request.Email))
+        {
+            return Unauthorized();
+        }
+
+        if (!await _authRepository.VerifyPasswordAsync(request.Password, request.Email))
+        {
+            return BadRequest("Wrong password.");
+        }
+        
+        var user = await _authRepository.GetUserByEmailAsync(request.Email);
+
+        var token = await _jwtService.GenerateToken(user);
+
+
+
+        return null;
+    }
+
 }
+

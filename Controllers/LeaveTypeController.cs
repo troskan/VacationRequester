@@ -16,23 +16,25 @@ namespace VacationRequester.Controllers
             _leaveTypeRepository = leaveTypeRepository;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _leaveTypeRepository.GetAllAsync());
         }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(Guid Id)
         {
             LeaveType leaveType = await _leaveTypeRepository.GetByIdAsync(Id);
             return Ok(leaveType);
         }
+
         [HttpPost]
         public async Task Create(LeaveType leaveTypeToCreate)
         {
             await _leaveTypeRepository.AddAsync(leaveTypeToCreate);
         }
+
         [HttpDelete]
         public async Task<IActionResult> Delete(Guid id)
         {
