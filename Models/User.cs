@@ -16,11 +16,9 @@ namespace VacationRequester.Models
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-
-        public string RefreshToken { get; set; }
-        public DateTime TokenCreated { get; set; }
-        public DateTime TokenExpires { get; set; }
-
+        public string? RefreshToken { get; set; }
+        public DateTime? TokenCreated { get; set; }
+        public DateTime? TokenExpires { get; set; }
 
         public string PasswordHash { get; set; } = string.Empty;
 
