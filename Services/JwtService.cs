@@ -11,6 +11,11 @@ public class JwtService
 {
     public string GenerateToken(User user)
     {
+        DateTime utcNow = DateTime.UtcNow;
+        TimeZoneInfo stockholmZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+        DateTime stockholmTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, stockholmZone);
+
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes("YourSecretKeyHere");
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -23,7 +28,7 @@ public class JwtService
                 new Claim(ClaimTypes.Name, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             }),
-            Expires = DateTime.UtcNow.AddMinutes(3), //Test value expire
+            Expires = utcNow.AddSeconds(20),  //Test value expire
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -33,6 +38,8 @@ public class JwtService
 
     public RefreshToken GenerateRefreshToken()
     {
+        
+
         var refreshToken = new RefreshToken()
         {
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
