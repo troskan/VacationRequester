@@ -71,7 +71,7 @@ public class AuthenticationController : ControllerBase
 
         if (!await _authRepository.VerifyPasswordAsync(request.Password, request.Email))
         {
-            return BadRequest("Wrong password.");
+            return Unauthorized();
         }
         
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
