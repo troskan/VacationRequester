@@ -48,5 +48,32 @@ namespace VacationRequester.Controllers
             return Ok(user);
         }
 
+        [Authorize]
+        [HttpPut,Route("SetUserRole"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SetRole(Guid id, int role)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest();
+            }
+
+            if (role != 1 || role != 2)
+            {
+                return NotFound("RoleId not found.");
+            }
+
+            var existingUser = await _userRepository.GetByIdAsync(id);
+
+            if (existingUser == null)
+            {
+                return NotFound("No user found.");
+            }
+            existingUser.Role = (Role)role;
+
+            await _userRepository.UpdateAsync(existingUser);
+
+            return Ok();
+        }
+
     }
 }
