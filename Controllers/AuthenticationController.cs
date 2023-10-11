@@ -52,7 +52,7 @@ public class AuthenticationController : ControllerBase
         }
 
         await _userRepository.AddAsync(userToRegister);
-       
+
         return Ok();
     }
 
@@ -73,7 +73,7 @@ public class AuthenticationController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
 
         var token = _jwtService.GenerateToken(user);
@@ -85,7 +85,27 @@ public class AuthenticationController : ControllerBase
 
         await _userRepository.UpdateAsync(user);
 
-        return Ok(new { token, refreshToken });
+        var accessTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = false, // Depending on whether client-side scripts need to access the token
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddMinutes(15) // Short-lived
+        };
+        Response.Cookies.Append("AccessToken", token, accessTokenCookieOptions);
+
+        // Create refresh token cookie
+        var refreshTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Restrict JavaScript access
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+        Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
+
+        return Ok(token);
+        //return Ok(new { token, refreshToken }); //Old return method without cookie
     }
 
     [Authorize]
