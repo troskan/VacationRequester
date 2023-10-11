@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VacationRequester.Models;
+using VacationRequester.Models.Dto;
 using VacationRequester.Repositories.Interfaces;
 
 namespace VacationRequester.Controllers;
@@ -50,12 +51,22 @@ public class LeaveRequestController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> Create(LeaveRequest leaveRequestToCreate)
+    public async Task<IActionResult> Create(LeaveRequestCreateDto leaveRequestToCreateDto)
     {
-        if(leaveRequestToCreate == null)
+        if (leaveRequestToCreateDto == null)
         {
             return BadRequest();
         }
+
+        LeaveRequest leaveRequestToCreate = new LeaveRequest
+        {
+            UserId = leaveRequestToCreateDto.UserId,
+            LeaveTypeId = leaveRequestToCreateDto.LeaveTypeId,
+            StartDate = leaveRequestToCreateDto.StartDate,
+            EndDate = leaveRequestToCreateDto.EndDate,
+            DateRequested = DateTime.UtcNow.AddHours(2),
+            ApprovalState = ApprovalState.Pending
+        };
 
         await _repository.AddAsync(leaveRequestToCreate);
         return CreatedAtAction(nameof(Create), leaveRequestToCreate.Id);
