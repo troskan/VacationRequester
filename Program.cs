@@ -1,16 +1,12 @@
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using VacationRequester.Data;
-using Microsoft.IdentityModel.Tokens;
 using VacationRequester.Repositories.Interfaces;
 using VacationRequester.Repositories;
 using VacationRequester.Middleware;
 using VacationRequester.Middleware.Cors;
 using VacationRequester.Services;
-using Microsoft.AspNetCore.Authentication;
-using AuthenticationMiddleware = VacationRequester.Middleware.Authentication.AuthenticationMiddleware;
-using VacationRequester.Models;
+using VacationRequester.Middleware.Authentication;
 
 namespace VacationRequester
 {
@@ -23,7 +19,6 @@ namespace VacationRequester
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
-            builder.Services.AddScoped(typeof(JwtService));
 
 
             //Jwt Services
@@ -53,6 +48,7 @@ namespace VacationRequester
             }
             app.Use(async (context, next) =>
             {
+                await Console.Out.WriteLineAsync("Inside the app middleware");
                 Console.WriteLine($"User authenticated: {context.User.Identity.IsAuthenticated}");
                 await next();
             });

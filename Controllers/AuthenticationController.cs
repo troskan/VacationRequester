@@ -76,7 +76,7 @@ public class AuthenticationController : ControllerBase
         
         var user = await _authRepository.GetUserByEmailAsync(request.Email);
 
-        var token = _jwtService.GenerateToken(user);
+        var jsonWebToken = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
 
         user.RefreshToken = refreshToken.Token;
@@ -85,7 +85,28 @@ public class AuthenticationController : ControllerBase
 
         await _userRepository.UpdateAsync(user);
 
-        return Ok(new { token, refreshToken });
+        // Create access token cookie
+        var accessTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = false, // Depending on whether client-side scripts need to access the token
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = jsonWebToken.Expires // Short-lived
+        };
+        Response.Cookies.Append("AccessToken", jsonWebToken.Token, accessTokenCookieOptions);
+
+        // Create refresh token cookie
+        var refreshTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Restrict JavaScript access
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7) // Long-lived
+        };
+        Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
+
+        return Ok();
+        //return Ok(new { token, refreshToken });
     }
 
     [Authorize]
@@ -106,11 +127,13 @@ public class AuthenticationController : ControllerBase
 
         var newAccessToken = _jwtService.GenerateToken(user);
         var newRefreshToken = _jwtService.GenerateRefreshToken();
-
+        
         user.RefreshToken = newRefreshToken.Token;
         user.TokenCreated = newRefreshToken.Created;
         user.TokenExpires = newRefreshToken.Expires;
         await _userRepository.UpdateAsync(user);
+
+
 
         return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
     }

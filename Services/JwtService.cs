@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
@@ -9,7 +10,7 @@ using VacationRequester.Models;
 namespace VacationRequester.Services;
 public class JwtService
 {
-    public string GenerateToken(User user)
+    public JsonWebTokenModel GenerateToken(User user)
     {
         DateTime utcNow = DateTime.UtcNow;
         TimeZoneInfo stockholmZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
@@ -21,6 +22,7 @@ public class JwtService
         {
             Issuer = "VacationRequesterAPI",
             Audience = "VacationRequesterApp",
+            IssuedAt = utcNow,
 
             Subject = new ClaimsIdentity(new Claim[]
             {
@@ -32,9 +34,17 @@ public class JwtService
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
-    }
 
+        tokenHandler.WriteToken(token);
+
+        var jsonWebToken = new JsonWebTokenModel
+        {
+            Token = tokenHandler.WriteToken(token),
+            Expires = tokenDescriptor.Expires.Value,
+            Created = tokenDescriptor.IssuedAt.Value
+        };
+        return jsonWebToken;
+    }
     public RefreshToken GenerateRefreshToken()
     {
         var refreshToken = new RefreshToken()
