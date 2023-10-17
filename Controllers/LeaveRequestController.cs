@@ -10,10 +10,12 @@ namespace VacationRequester.Controllers;
 public class LeaveRequestController : ControllerBase
 {
     private readonly IRepository<LeaveRequest> _repository;
+    private readonly ILeaveRequestRepository _leaveRequestRepository;
 
-    public LeaveRequestController(IRepository<LeaveRequest> repository)
+    public LeaveRequestController(IRepository<LeaveRequest> repository, ILeaveRequestRepository leaveRequestRepository)
     {
         _repository = repository;
+        _leaveRequestRepository = leaveRequestRepository;
     }
 
     [Authorize]
@@ -21,6 +23,20 @@ public class LeaveRequestController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var leaveRequests = await _repository.GetAllAsync();
+
+        if (leaveRequests == null || !leaveRequests.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(leaveRequests);
+    }
+
+    [Authorize]
+    [HttpGet("GetLeaveRequestById")]
+    public async Task<IActionResult> GetAll(Guid id)
+    {
+        var leaveRequests = await _leaveRequestRepository.GetAllByUserIdAsync(id);
 
         if (leaveRequests == null || !leaveRequests.Any())
         {

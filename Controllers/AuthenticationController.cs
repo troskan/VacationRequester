@@ -106,7 +106,7 @@ public class AuthenticationController : ControllerBase
         Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
 
         return Ok();
-        //return Ok(new { token, refreshToken });
+        //return Ok(new { jsonWebToken, refreshToken });
     }
 
     [Authorize]
