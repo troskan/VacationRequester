@@ -90,7 +90,7 @@ public class AuthenticationController : ControllerBase
         {
             HttpOnly = false, // Depending on whether client-side scripts need to access the token
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = jsonWebToken.Expires // Short-lived
         };
         Response.Cookies.Append("AccessToken", jsonWebToken.Token, accessTokenCookieOptions);
@@ -100,7 +100,7 @@ public class AuthenticationController : ControllerBase
         {
             HttpOnly = true, // Restrict JavaScript access
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7) // Long-lived
         };
         Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
