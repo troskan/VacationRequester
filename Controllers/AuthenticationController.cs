@@ -88,7 +88,7 @@ public class AuthenticationController : ControllerBase
         // Create access token cookie
         var accessTokenCookieOptions = new CookieOptions
         {
-            HttpOnly = false, // Depending on whether client-side scripts need to access the token
+            HttpOnly = true, // Depending on whether client-side scripts need to access the token
             Secure = true,
             SameSite = SameSiteMode.None,
             Expires = jsonWebToken.Expires // Short-lived
@@ -98,7 +98,7 @@ public class AuthenticationController : ControllerBase
         // Create refresh token cookie
         var refreshTokenCookieOptions = new CookieOptions
         {
-            HttpOnly = true, // Restrict JavaScript access
+            HttpOnly = false, // Restrict JavaScript access
             Secure = true,
             SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7) // Long-lived

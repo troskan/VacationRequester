@@ -11,13 +11,11 @@ namespace VacationRequester.Middleware
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
                 opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    In = ParameterLocation.Header,
+                    In = ParameterLocation.Cookie, // Set to Cookie since JWT comes from cookie
                     Description = "Please enter token",
-                    Name = "Authorization",
+                    Name = "AccessToken",
                     Type = SecuritySchemeType.Http,
                     BearerFormat = "JWT",
-                    Scheme = "bearer"
-
                 });
 
                 opt.AddSecurityRequirement(new OpenApiSecurityRequirement
