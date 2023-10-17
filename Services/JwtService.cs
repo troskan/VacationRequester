@@ -43,6 +43,7 @@ public class JwtService
             Expires = tokenDescriptor.Expires.Value,
             Created = tokenDescriptor.IssuedAt.Value
         };
+
         return jsonWebToken;
     }
     public RefreshToken GenerateRefreshToken()
