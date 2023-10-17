@@ -19,6 +19,8 @@ namespace VacationRequester
             // Add services to the container.
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
+            builder.Services.AddScoped(typeof(ILeaveRequestRepository), typeof(LeaveRequestRepository));
+
 
 
             //Jwt Services
