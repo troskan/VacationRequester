@@ -133,9 +133,22 @@ public class AuthenticationController : ControllerBase
         user.TokenExpires = newRefreshToken.Expires;
         await _userRepository.UpdateAsync(user);
 
+        //Response.Cookies.Delete("AccessToken");
+        //Response.Cookies.Delete("RefreshToken");
+
+        // Create refresh token cookie
+        var refreshTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Restrict JavaScript access
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7) // Long-lived
+        };
+        Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
 
 
-        return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
+        return Ok();
+        //return Ok(new { token = newAccessToken, refreshToken = newRefreshToken });
     }
 }
 
