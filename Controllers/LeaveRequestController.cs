@@ -18,18 +18,33 @@ public class LeaveRequestController : ControllerBase
         _leaveRequestRepository = leaveRequestRepository;
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var leaveRequests = await _repository.GetAllAsync();
+        var leaveRequests = await _leaveRequestRepository.GetAllWithJoin();
+
+        var leaveRequestsToReturn = new List<GetLeaveRequestDto>();
+        foreach (var request in leaveRequests)
+        {
+            leaveRequestsToReturn.Add(new GetLeaveRequestDto()
+            {
+                LeaveRequestId = request.Id,
+                UserId = request.UserId,
+                EmployeeName = request.User.FirstName + " " + request.User.LastName,
+                LeaveType = request.LeaveType.Type,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                DateRequested = request.DateRequested,
+                ApprovalState = request.ApprovalState
+            });
+        }
 
         if (leaveRequests == null || !leaveRequests.Any())
         {
             return NotFound();
         }
 
-        return Ok(leaveRequests);
+        return Ok(leaveRequestsToReturn);
     }
 
     [Authorize]
