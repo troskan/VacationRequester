@@ -112,83 +112,83 @@ public class AuthenticationController : ControllerBase
     }
 
     [Authorize]
-[HttpPost("RefreshToken")]
-public async Task<IActionResult> RefreshToken()
-{
-
-    if (!Request.Cookies.TryGetValue("RefreshToken", out string oldRefreshToken) || string.IsNullOrEmpty(oldRefreshToken))
+    [HttpPost("RefreshToken")]
+    public async Task<IActionResult> RefreshToken()
     {
-        return BadRequest("Refresh Token not found in cookie.");
+
+        if (!Request.Cookies.TryGetValue("RefreshToken", out string oldRefreshToken) || string.IsNullOrEmpty(oldRefreshToken))
+        {
+            return BadRequest("Refresh Token not found in cookie.");
+        }
+
+        if (oldRefreshToken == null)
+        {
+            return BadRequest();
+        }
+        var user = await _authRepository.GetUserByRefreshToken(new RefreshToken { Token = oldRefreshToken });
+
+        if (user == null || user.TokenExpires < DateTime.Now)
+        {
+            return Unauthorized();
+        }
+
+        var newJsonWebToken = _jwtService.GenerateToken(user);
+        var newRefreshToken = _jwtService.GenerateRefreshToken();
+
+        // Create access token cookie
+        var accessTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Depending on whether client-side scripts need to access the token
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = newJsonWebToken.Expires // Short-lived
+        };
+
+        // Create refresh token cookie
+        var refreshTokenCookieOptions = new CookieOptions
+        {
+            HttpOnly = false, // Restrict JavaScript access
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(7) // Long-lived
+        };
+        Response.Cookies.Append("AccessToken", newJsonWebToken.Token, accessTokenCookieOptions);
+        Response.Cookies.Append("RefreshToken", newRefreshToken.Token, refreshTokenCookieOptions);
+
+        user.RefreshToken = newRefreshToken.Token;
+        user.TokenCreated = newRefreshToken.Created;
+        user.TokenExpires = newRefreshToken.Expires;
+        await _userRepository.UpdateAsync(user);
+
+        return Ok();
     }
 
-    if (oldRefreshToken == null)
-    {
-        return BadRequest();
-    }
-    var user = await _authRepository.GetUserByRefreshToken(new RefreshToken { Token = oldRefreshToken });
-
-    if (user == null || user.TokenExpires < DateTime.Now)
-    {
-        return Unauthorized();
-    }
-
-    var newJsonWebToken = _jwtService.GenerateToken(user);
-    var newRefreshToken = _jwtService.GenerateRefreshToken();
-
-    // Create access token cookie
-    var accessTokenCookieOptions = new CookieOptions
-    {
-        HttpOnly = true, // Depending on whether client-side scripts need to access the token
-        Secure = true,
-        SameSite = SameSiteMode.None,
-        Expires = newJsonWebToken.Expires // Short-lived
-    };
-
-    // Create refresh token cookie
-    var refreshTokenCookieOptions = new CookieOptions
-    {
-        HttpOnly = false, // Restrict JavaScript access
-        Secure = true,
-        SameSite = SameSiteMode.None,
-        Expires = DateTime.UtcNow.AddDays(7) // Long-lived
-    };
-    Response.Cookies.Append("AccessToken", newJsonWebToken.Token, accessTokenCookieOptions);
-    Response.Cookies.Append("RefreshToken", newRefreshToken.Token, refreshTokenCookieOptions);
-
-    user.RefreshToken = newRefreshToken.Token;
-    user.TokenCreated = newRefreshToken.Created;
-    user.TokenExpires = newRefreshToken.Expires;
-    await _userRepository.UpdateAsync(user);
-
-    return Ok();
-}
-    
     [Authorize]
-[HttpPost("Logout")]
-public async Task<IActionResult> Logout()
-{
-    if (!Request.Cookies.TryGetValue("RefreshToken", out string refreshToken) || string.IsNullOrEmpty(refreshToken))
+    [HttpPost("Logout")]
+    public async Task<IActionResult> Logout()
     {
-        return BadRequest("Refresh Token not found in cookie.");
+        if (!Request.Cookies.TryGetValue("RefreshToken", out string refreshToken) || string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest("Refresh Token not found in cookie.");
+        }
+
+        var user = await _authRepository.GetUserByRefreshToken(new RefreshToken { Token = refreshToken });
+
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        user.RefreshToken = null;
+        user.TokenCreated = null;
+        user.TokenExpires = null;
+        await _userRepository.UpdateAsync(user);
+
+        Response.Cookies.Delete("AccessToken");
+        Response.Cookies.Delete("RefreshToken");
+
+        return Ok("Logged out");
     }
-
-    var user = await _authRepository.GetUserByRefreshToken(new RefreshToken { Token = refreshToken });
-
-    if (user == null)
-    {
-        return BadRequest();
-    }
-
-    user.RefreshToken = null;
-    user.TokenCreated = null;
-    user.TokenExpires = null;
-    await _userRepository.UpdateAsync(user);
-
-    Response.Cookies.Delete("AccessToken");
-    Response.Cookies.Delete("RefreshToken");
-
-    return Ok("Logged out");
-}
 
 }
 
