@@ -63,9 +63,9 @@ public class LeaveRequestController : ControllerBase
 
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, LeaveRequest leaveRequestToUpdate)
+    public async Task<IActionResult> Update(Guid id, EditLeaveRequestDto leaveRequestToUpdateDto)
     {
-        if (leaveRequestToUpdate == null || id != leaveRequestToUpdate.Id)
+        if (leaveRequestToUpdateDto == null || id != leaveRequestToUpdateDto.Id)
         {
             return BadRequest();
         }
@@ -77,14 +77,13 @@ public class LeaveRequestController : ControllerBase
             return NotFound();
         }
 
-        existingLeaveRequest.User = leaveRequestToUpdate.User;
-        existingLeaveRequest.UserId = leaveRequestToUpdate.UserId;
-        existingLeaveRequest.LeaveType = leaveRequestToUpdate.LeaveType;
-        existingLeaveRequest.LeaveTypeId = leaveRequestToUpdate.LeaveTypeId;
-        existingLeaveRequest.StartDate = leaveRequestToUpdate.StartDate;
-        existingLeaveRequest.EndDate = leaveRequestToUpdate.EndDate;
-        existingLeaveRequest.DateRequested = leaveRequestToUpdate.DateRequested;
-        existingLeaveRequest.ApprovalState = leaveRequestToUpdate.ApprovalState;
+        // Mapping from DTO to the actual LeaveRequest entity
+        existingLeaveRequest.UserId = leaveRequestToUpdateDto.UserId;
+        existingLeaveRequest.LeaveTypeId = leaveRequestToUpdateDto.LeaveTypeId;
+        existingLeaveRequest.StartDate = leaveRequestToUpdateDto.StartDate;
+        existingLeaveRequest.EndDate = leaveRequestToUpdateDto.EndDate;
+        existingLeaveRequest.DateRequested = leaveRequestToUpdateDto.DateRequested;
+        existingLeaveRequest.ApprovalState = leaveRequestToUpdateDto.ApprovalState;
 
         await _repository.UpdateAsync(existingLeaveRequest);
         return NoContent();
