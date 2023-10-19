@@ -22,5 +22,16 @@ namespace VacationRequester.Repositories
                       .ToListAsync();
 
         }
+        
+        public async Task<IEnumerable<LeaveRequest>> GetAllWithJoin()
+        {
+            return await _context.LeaveRequests
+                .Include(lr => lr.User)
+                .Include(lr => lr.LeaveType)
+                .OrderBy(lr => lr.StartDate)
+                .ToListAsync();
+
+
+        }
     }
 }
