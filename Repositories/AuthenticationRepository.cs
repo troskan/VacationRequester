@@ -63,7 +63,7 @@ namespace VacationRequester.Repositories
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            if( email == null )
+            if(string.IsNullOrEmpty(email))
             {
                 return null;
             }

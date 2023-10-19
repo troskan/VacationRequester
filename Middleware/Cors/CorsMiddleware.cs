@@ -7,12 +7,15 @@
             var corsSettings = new CorsSettings();
             configuration.GetSection("Cors").Bind(corsSettings);
 
+            builder.Services.AddSingleton(corsSettings);
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowMyOrigin",
                 builder => builder.WithOrigins(corsSettings.AllowedOrigins)
                                   .AllowAnyHeader()
-                                  .AllowAnyMethod());
+                                  .AllowAnyMethod()
+                                  .AllowCredentials());
             });
         }
     }

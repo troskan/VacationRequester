@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VacationRequester.Models;
+using VacationRequester.Models.Dto;
 using VacationRequester.Repositories.Interfaces;
 
 namespace VacationRequester.Controllers;
@@ -9,10 +10,12 @@ namespace VacationRequester.Controllers;
 public class LeaveRequestController : ControllerBase
 {
     private readonly IRepository<LeaveRequest> _repository;
+    private readonly ILeaveRequestRepository _leaveRequestRepository;
 
-    public LeaveRequestController(IRepository<LeaveRequest> repository)
+    public LeaveRequestController(IRepository<LeaveRequest> repository, ILeaveRequestRepository leaveRequestRepository)
     {
         _repository = repository;
+        _leaveRequestRepository = leaveRequestRepository;
     }
 
     [Authorize]
@@ -20,6 +23,20 @@ public class LeaveRequestController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var leaveRequests = await _repository.GetAllAsync();
+
+        if (leaveRequests == null || !leaveRequests.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(leaveRequests);
+    }
+
+    [Authorize]
+    [HttpGet("GetLeaveRequestById")]
+    public async Task<IActionResult> GetAll(Guid id)
+    {
+        var leaveRequests = await _leaveRequestRepository.GetAllByUserIdAsync(id);
 
         if (leaveRequests == null || !leaveRequests.Any())
         {
@@ -50,12 +67,22 @@ public class LeaveRequestController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> Create(LeaveRequest leaveRequestToCreate)
+    public async Task<IActionResult> Create(LeaveRequestCreateDto leaveRequestToCreateDto)
     {
-        if(leaveRequestToCreate == null)
+        if (leaveRequestToCreateDto == null)
         {
             return BadRequest();
         }
+
+        LeaveRequest leaveRequestToCreate = new LeaveRequest
+        {
+            UserId = leaveRequestToCreateDto.UserId,
+            LeaveTypeId = leaveRequestToCreateDto.LeaveTypeId,
+            StartDate = leaveRequestToCreateDto.StartDate,
+            EndDate = leaveRequestToCreateDto.EndDate,
+            DateRequested = DateTime.UtcNow.AddHours(2),
+            ApprovalState = ApprovalState.Pending
+        };
 
         await _repository.AddAsync(leaveRequestToCreate);
         return CreatedAtAction(nameof(Create), leaveRequestToCreate.Id);

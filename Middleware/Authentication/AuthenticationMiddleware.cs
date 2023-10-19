@@ -12,6 +12,10 @@ namespace VacationRequester.Middleware.Authentication
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddCookie(x =>
+            {
+                x.Cookie.Name = "AccessToken";
+
             }).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -25,6 +29,14 @@ namespace VacationRequester.Middleware.Authentication
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere")),
                     RequireExpirationTime = true,
                     ClockSkew = TimeSpan.FromSeconds(0) // Eliminate clock skew to get exact expiration time
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["AccessToken"];
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }

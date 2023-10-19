@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using VacationRequester.Models;
 using VacationRequester.Repositories.Interfaces;
 
-namespace VacationRequester.Controllers
-{
+namespace VacationRequester.Controllers;
+
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase
@@ -76,4 +76,3 @@ namespace VacationRequester.Controllers
         }
 
     }
-}
