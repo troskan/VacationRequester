@@ -112,7 +112,16 @@ public class AuthenticationController : ControllerBase
         };
         Response.Cookies.Append("RefreshToken", refreshToken.Token, refreshTokenCookieOptions);
 
-        return Ok(user);
+        UserResponseDto userResponse = new UserResponseDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            Role = user.Role
+        };
+
+        return Ok(userResponse);
         //return Ok(new { jsonWebToken, refreshToken });
     }
 
