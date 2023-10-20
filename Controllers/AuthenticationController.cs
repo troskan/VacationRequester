@@ -35,6 +35,11 @@ public class AuthenticationController : ControllerBase
             return BadRequest();
         }
 
+        if (await _authRepository.VerifyEmailAsync(registerDto.Email))
+        {
+            return BadRequest("Email already exists.");
+        }
+
         string passwordHash
             = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
