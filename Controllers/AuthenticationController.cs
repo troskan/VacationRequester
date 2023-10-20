@@ -40,6 +40,7 @@ public class AuthenticationController : ControllerBase
             return BadRequest("Email already exists.");
         }
 
+
         string passwordHash
             = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
