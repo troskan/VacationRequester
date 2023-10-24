@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VacationRequester.Models;
 using VacationRequester.Models.Dto;
 using VacationRequester.Repositories.Interfaces;
+using VacationRequester.Services;
 
 namespace VacationRequester.Controllers;
 [ApiController]
@@ -10,12 +11,18 @@ namespace VacationRequester.Controllers;
 public class LeaveRequestController : ControllerBase
 {
     private readonly IRepository<LeaveRequest> _repository;
+    private readonly IRepository<User> _userRepo;
     private readonly ILeaveRequestRepository _leaveRequestRepository;
+    private readonly IEmailService _mailer;
 
-    public LeaveRequestController(IRepository<LeaveRequest> repository, ILeaveRequestRepository leaveRequestRepository)
+    public LeaveRequestController(IRepository<LeaveRequest> repository, 
+        ILeaveRequestRepository leaveRequestRepository, IRepository<User> userRepo,
+        IEmailService mailer)
     {
         _repository = repository;
+        _userRepo = userRepo;
         _leaveRequestRepository = leaveRequestRepository;
+        _mailer = mailer;
     }
 
     [HttpGet]
@@ -104,15 +111,15 @@ public class LeaveRequestController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, EditLeaveRequestDto leaveRequestToUpdateDto)
+    [HttpPut]
+    public async Task<IActionResult> Update(EditLeaveRequestDto leaveRequestToUpdateDto)
     {
-        if (leaveRequestToUpdateDto == null || id != leaveRequestToUpdateDto.Id)
+        if (leaveRequestToUpdateDto == null)
         {
             return BadRequest();
         }
 
-        var existingLeaveRequest = await _repository.GetByIdAsync(id);
+        var existingLeaveRequest = await _repository.GetByIdAsync(leaveRequestToUpdateDto.Id);
 
         if (existingLeaveRequest == null)
         {
@@ -128,6 +135,24 @@ public class LeaveRequestController : ControllerBase
         existingLeaveRequest.ApprovalState = leaveRequestToUpdateDto.ApprovalState;
 
         await _repository.UpdateAsync(existingLeaveRequest);
+
+        User user = await _userRepo.GetByIdAsync(existingLeaveRequest.UserId);
+
+        string emailBody = $"Hi {user.FirstName},\n\n" +
+            $"Your leave request has been {existingLeaveRequest.ApprovalState}. " +
+            $"Please login for further information.\n\n" +
+            $"/System admin";
+
+
+        var mailToSend = new EmailDto
+        {
+            To = user.Email,
+            Subject = "Your leave request has been updated",
+            Body = emailBody
+        };
+
+        await _mailer.SendEmail(mailToSend);
+        
         return NoContent();
     }
 

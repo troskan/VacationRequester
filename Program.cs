@@ -1,4 +1,5 @@
-
+global using VacationRequester.Services.EmailService;
+global using VacationRequester.Models;
 using Microsoft.EntityFrameworkCore;
 using VacationRequester.Data;
 using VacationRequester.Repositories.Interfaces;
@@ -7,6 +8,8 @@ using VacationRequester.Middleware;
 using VacationRequester.Middleware.Cors;
 using VacationRequester.Services;
 using VacationRequester.Middleware.Authentication;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace VacationRequester
 {
@@ -20,8 +23,7 @@ namespace VacationRequester
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
             builder.Services.AddScoped(typeof(ILeaveRequestRepository), typeof(LeaveRequestRepository));
-
-
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             //Jwt Services
             builder.Services.AddScoped<JwtService>();
