@@ -16,7 +16,7 @@ namespace VacationRequester.Repositories
 
         public async Task<IEnumerable<LeaveRequest>> GetAllByUserIdAsync(Guid userId)
         {
-            return await _context.LeaveRequests
+            return await _context.LeaveRequests.Include(lt => lt.LeaveType)
                       .Where(lr => lr.UserId == userId)
                       .OrderBy(lr => lr.StartDate)
                       .ToListAsync();

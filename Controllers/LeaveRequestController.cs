@@ -48,7 +48,7 @@ public class LeaveRequestController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("GetLeaveRequestsById")]
+    [HttpGet("GetLeaveRequestsById/{id}")]
     public async Task<IActionResult> GetAll(Guid id)
     {
         var leaveRequests = await _leaveRequestRepository.GetAllByUserIdAsync(id);
