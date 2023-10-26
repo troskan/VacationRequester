@@ -12,10 +12,12 @@ namespace VacationRequester.Controllers
     public class LeaveTypeController : ControllerBase
     {
         private readonly IRepository<LeaveType> _leaveTypeRepository;
+        private readonly IRepository<LeaveRequest> _leaveRequestRepository;
 
-        public LeaveTypeController(IRepository<LeaveType> leaveTypeRepository)
+        public LeaveTypeController(IRepository<LeaveType> leaveTypeRepository, IRepository<LeaveRequest> leaveRequestRepository)
         {
             _leaveTypeRepository = leaveTypeRepository;
+            _leaveRequestRepository = leaveRequestRepository;
         }
 
         [Authorize]
@@ -87,6 +89,18 @@ namespace VacationRequester.Controllers
                 return BadRequest();
             }
             var leaveTypeToDelete = await _leaveTypeRepository.GetByIdAsync(id);
+
+            var leaveRequests = await _leaveRequestRepository.GetAllAsync();
+            if (leaveRequests.Any())
+            {
+                foreach (var leaveRequest in leaveRequests)
+                {
+                    if (leaveRequest.LeaveTypeId == leaveTypeToDelete.Id)
+                    {
+                        return BadRequest($"Leave type is in use. There are a total of {leaveRequests.Count()} Leaverequests with leave type {leaveTypeToDelete.Type}");
+                    }
+                }
+            }
 
             if (leaveTypeToDelete == null)
             {
