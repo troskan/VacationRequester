@@ -97,7 +97,7 @@ namespace VacationRequester.Controllers
                 {
                     if (leaveRequest.LeaveTypeId == leaveTypeToDelete.Id)
                     {
-                        return BadRequest("Leave type is in use.");
+                        return BadRequest($"Leave type is in use. There are a total of {leaveRequests.Count()} Leaverequests with leave type {leaveTypeToDelete.Type}");
                     }
                 }
             }
