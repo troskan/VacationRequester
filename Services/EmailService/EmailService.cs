@@ -16,20 +16,30 @@ namespace VacationRequester.Services.EmailService
         }
         public Task SendEmail(EmailDto request)
         {
-            var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse("elliot.weber@ethereal.email"));
-            email.To.Add(MailboxAddress.Parse(request.To));
-            email.Subject = request.Subject;
-            email.Body = new TextPart(TextFormat.Text) { Text = request.Body };
+            try
+            {
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse("elliot.weber@ethereal.email"));
+                email.To.Add(MailboxAddress.Parse(request.To));
+                email.Subject = request.Subject;
+                email.Body = new TextPart(TextFormat.Text) { Text = request.Body };
 
-            using var smtp = new SmtpClient();
-            smtp.CheckCertificateRevocation = false;
-            smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_config["EmailConfig:UserName"], _config["EmailConfig:Password"]);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+                using var smtp = new SmtpClient();
+                smtp.CheckCertificateRevocation = false;
+                smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
 
-            return Task.CompletedTask;
+                smtp.Authenticate(_config["EmailConfig:UserName"], _config["EmailConfig:Password"]);
+                smtp.Send(email);
+                smtp.Disconnect(true);
+
+                return Task.CompletedTask;
+            }
+            catch (Exception e)
+            {
+                e.Data.Add("EmailService", "SendEmail");
+                return Task.FromException(e);
+            }
+
         }
     }
 }

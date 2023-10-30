@@ -114,6 +114,7 @@ public class LeaveRequestController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Update(EditLeaveRequestDto leaveRequestToUpdateDto)
     {
+
         if (leaveRequestToUpdateDto == null)
         {
             return BadRequest();
@@ -137,6 +138,10 @@ public class LeaveRequestController : ControllerBase
         await _repository.UpdateAsync(existingLeaveRequest);
 
         User user = await _userRepo.GetByIdAsync(existingLeaveRequest.UserId);
+        if(user == null)
+        {
+            return NotFound("User not found");
+        }
 
         string emailBody = $"Hi {user.FirstName},\n\n" +
             $"Your leave request has been {existingLeaveRequest.ApprovalState}. " +
@@ -152,7 +157,7 @@ public class LeaveRequestController : ControllerBase
         };
 
         await _mailer.SendEmail(mailToSend);
-        
+
         return NoContent();
     }
 
