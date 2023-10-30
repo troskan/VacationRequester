@@ -91,6 +91,7 @@ namespace VacationRequester.Controllers
             var leaveTypeToDelete = await _leaveTypeRepository.GetByIdAsync(id);
 
             var leaveRequests = await _leaveRequestRepository.GetAllAsync();
+            leaveRequests = leaveRequests.Where(lr => lr.LeaveTypeId == leaveTypeToDelete.Id);
             if (leaveRequests.Any())
             {
                 foreach (var leaveRequest in leaveRequests)
